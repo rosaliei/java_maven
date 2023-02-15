@@ -23,6 +23,7 @@ pipeline {
             steps {
                 echo "next version = ${NEXT_VERSION}"
             }
+	}
         
         stage('Build') {
             steps {
