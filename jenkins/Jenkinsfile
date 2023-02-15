@@ -1,6 +1,29 @@
+properties([
+	buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '1', numToKeepStr: '1')),
+])
+
 pipeline {
     agent any
+    
+    environment {
+		image = "backoffice-web-v2"
+
+		now = sh (
+			returnStdout: true,
+			script: """
+			echo \$(date "+%Y%m%d-%H%M")
+			"""
+		).trim()
+
+	}
+    
     stages {
+        
+        stage('Versioning') {
+            steps {
+                echo "next version = ${NEXT_VERSION}"
+            }
+        
         stage('Build') {
             steps {
                 sh 'mvn -B -DskipTests clean package'
