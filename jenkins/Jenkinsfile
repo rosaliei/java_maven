@@ -7,6 +7,7 @@ pipeline {
     
     environment {
 		image = "backoffice-web-v2"
+	    	NEXT_VERSION = nextVersion()
 
 		now = sh (
 			returnStdout: true,
@@ -21,7 +22,7 @@ pipeline {
         
        stage('Version') {
             steps {
-                echo "Hello"
+                echo "next version = ${NEXT_VERSION}"
             }
         }
         
@@ -46,5 +47,4 @@ pipeline {
             }
         }
     }
-}
 }
