@@ -5,8 +5,7 @@ properties([
 pipeline {
     agent any
     
-    environment {
-		image = "backoffice-web-v2"
+	environment {
 	    	NEXT_VERSION = nextVersion()
 
 		now = sh (
