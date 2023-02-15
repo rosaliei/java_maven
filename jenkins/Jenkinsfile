@@ -19,11 +19,11 @@ pipeline {
     
     stages {
         
-        stage('Versioning') {
+       stage('Version') {
             steps {
-                echo "next version = ${NEXT_VERSION}"
+                echo "Hello"
             }
-	}
+        }
         
         stage('Build') {
             steps {
