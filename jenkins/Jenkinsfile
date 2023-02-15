@@ -6,7 +6,7 @@ pipeline {
     agent any
     
 	environment {
-	    	NEXT_VERSION = nextVersion()
+	   
 
 		now = sh (
 			returnStdout: true,
