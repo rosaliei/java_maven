@@ -22,10 +22,8 @@ pipeline {
             steps {
 		    
 		// Get the latest git commit message
-                def lastCommit = sh(
-                    returnStdout: true,
-                    script: 'git log -1 --pretty=%B'
-                ).trim()
+                def lastCommit = sh(script: "git log --format=%B -n 1 HEAD", returnStdout: true).trim()
+
 
                 // Increment the version number based on the commit message
                 if (lastCommit.contains('major')) {
