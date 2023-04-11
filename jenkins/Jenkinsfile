@@ -17,7 +17,7 @@ pipeline {
         
        stage('Version') {
             steps {
-                scripts {
+                script {
                 // Check commit message for "major", "minor", or "patch"
                 if (LAST_COMMIT.contains('major')) {
                     // Increment major version
