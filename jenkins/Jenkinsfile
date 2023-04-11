@@ -21,7 +21,24 @@ pipeline {
        stage('Version') {
             steps {
                 echo "next version is blah blah blah"
+		    
+        script {
+          def lastCommit = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
+          echo "Last commit message: ${lastCommit}"
+        }
+        // Generate semantic version number based on commit message
+        script {
+          def version = semVer(
+            increment: semverIncrement(lastCommit),
+            majorVersion: 1,
+            minorVersion: 0,
+            patchVersion: 0
+          )
+          env.VERSION = version.toString()
+	}	    
+		    
             }
+	    
         }
         
         stage('Build') {
