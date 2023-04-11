@@ -18,17 +18,17 @@ pipeline {
        stage('Version') {
             steps {
                 script {
-                // Check commit message for "major", "minor", or "patch"
-                if (LAST_COMMIT.contains('major')) {
-                    // Increment major version
-                    VERSION = "${VERSION.nextMajorVersion}.0.0"
-                } else if (LAST_COMMIT.contains('minor')) {
-                    // Increment minor version
-                    VERSION = "${VERSION.nextMinorVersion}.0"
-                } else {
-                    // Increment patch version
-                    VERSION = "${VERSION.nextPatchVersion}"
-                }
+             def version = new VersionNumber(VERSION)
+             if (LAST_COMMIT.contains('major')) {
+             version.incrementMajorVersion()
+            } else if (LAST_COMMIT.contains('minor')) {
+                version.incrementMinorVersion()
+            } else {
+                version.incrementBugfixVersion()
+            }
+            VERSION = version.toString()
+            echo "New version is ${VERSION}"
+        }
                 }
                 
                 // Print the new version
