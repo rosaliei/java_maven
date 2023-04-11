@@ -20,6 +20,21 @@ pipeline {
         
        stage('Version') {
             steps {
+		    
+		// Get the latest git commit message
+                def lastCommit = sh(
+                    returnStdout: true,
+                    script: 'git log -1 --pretty=%B'
+                ).trim()
+
+                // Increment the version number based on the commit message
+                if (lastCommit.contains('major')) {
+                    VERSION = sh(script: 'semver -i major ${VERSION} | cut -c2-', returnStdout: true).trim()
+                } else if (lastCommit.contains('minor')) {
+                    VERSION = sh(script: 'semver -i minor ${VERSION} | cut -c2-', returnStdout: true).trim()
+                } else if (lastCommit.contains('patch')) {
+                    VERSION = sh(script: 'semver -i patch ${VERSION} | cut -c2-', returnStdout: true).trim()
+                }
                 
                 echo "next version is blah blah blah"
 		    
