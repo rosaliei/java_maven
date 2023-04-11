@@ -1,61 +1,58 @@
 properties([
-	buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '1', numToKeepStr: '1')),
+    buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '1', numToKeepStr: '1')),
 ])
 
 pipeline {
     agent any
     
-	environment {
-	 
-		now = sh (
-			returnStdout: true,
-			script: """
-			echo \$(date "+%Y%m%d-%H%M")
-			"""
-		).trim()
-
-	}
+    environment {
+        // Define initial version number
+        VERSION = '1.0.0'
+        
+        // Get the last commit message
+        LAST_COMMIT = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
+    }
     
     stages {
         
        stage('Version') {
             steps {
-		    
-		// Get the latest git commit message
-                def lastCommit = sh(script: "git log --format=%B -n 1 HEAD", returnStdout: true).trim()
-
-
-                // Increment the version number based on the commit message
-                if (lastCommit.contains('major')) {
-                    VERSION = sh(script: 'semver -i major ${VERSION} | cut -c2-', returnStdout: true).trim()
-                } else if (lastCommit.contains('minor')) {
-                    VERSION = sh(script: 'semver -i minor ${VERSION} | cut -c2-', returnStdout: true).trim()
-                } else if (lastCommit.contains('patch')) {
-                    VERSION = sh(script: 'semver -i patch ${VERSION} | cut -c2-', returnStdout: true).trim()
+                // Check commit message for "major", "minor", or "patch"
+                if (LAST_COMMIT.contains('major')) {
+                    // Increment major version
+                    VERSION = "${VERSION.nextMajorVersion}.0.0"
+                } else if (LAST_COMMIT.contains('minor')) {
+                    // Increment minor version
+                    VERSION = "${VERSION.nextMinorVersion}.0"
+                } else {
+                    // Increment patch version
+                    VERSION = "${VERSION.nextPatchVersion}"
                 }
                 
-                echo "next version is blah blah blah"
-		    
+                // Print the new version
+                echo "New version is ${VERSION}"
             }
-	    
         }
         
         stage('Build') {
             steps {
-                sh 'mvn -B -DskipTests clean package'
+                sh 'mvn -B -DskipTests -Dversion=${VERSION} clean package'
             }
         }
+        
         stage('Test') {
             steps {
                 sh 'mvn test'
             }
+            
             post {
                 always {
                     junit 'target/surefire-reports/*.xml'
                 }
             }
         }
-        stage('Delivers') {
+        
+        stage('Deliver') {
             steps {
                 sh './jenkins/scripts/deliver.sh' //test
             }
